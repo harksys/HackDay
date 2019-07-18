@@ -59,9 +59,15 @@ namespace Application.Core
             });
 
             await _mqttClient.ConnectAsync(_mqttClientOptions);
+
+            var filter = new TopicFilterBuilder()
+                .WithTopic("#")
+                .Build();
+
+            await _mqttClient.SubscribeAsync(filter);
         }
 
-        public async Task SubscribeAsync(string metricId, Action<Metric> handler)
+        public void Handle(string metricId, Action<Metric> handler)
         {
             if (string.IsNullOrWhiteSpace(metricId))
             {
@@ -73,11 +79,11 @@ namespace Application.Core
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            await SubscribeAsync(metricId, async metric =>
+            Subscribe(metricId, async metric =>
                 await Task.Run(() => handler(metric)));
         }
 
-        public async Task SubscribeAsync(string metricId, Func<Metric, Task> handler)
+        public void Handle(string metricId, Func<Metric, Task> handler)
         {
             if (string.IsNullOrWhiteSpace(metricId))
             {
@@ -96,12 +102,6 @@ namespace Application.Core
                 handlers = new List<Func<Metric, Task>>();
 
                 _handlers.Add(topic, handlers);
-
-                var filter = new TopicFilterBuilder()
-                    .WithTopic(topic)
-                    .Build();
-
-                await _mqttClient.SubscribeAsync(filter);
             }
 
             handlers.Add(handler);

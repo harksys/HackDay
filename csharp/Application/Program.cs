@@ -22,7 +22,7 @@ namespace Application
 
             Console.WriteLine("Successfully connected to metric stream");
 
-            await metrics.SubscribeAsync("temperature", async metric =>
+            metrics.Handle("temperature", async metric =>
             {
                 await controls.SetDeviceStateAsync("redLamp", metric.Value >= HotTemperature);
                 await controls.SetDeviceStateAsync("blueLamp", metric.Value <= ColdTemperature);

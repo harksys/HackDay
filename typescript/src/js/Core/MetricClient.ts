@@ -8,8 +8,7 @@ type Metric = {
     value: number
 };
 
-type MetricCallback = (metric: Metric) => Promise<void>;
-type Unsubscribe = () => void;
+type CallbackHandleMetric = (metric: Metric) => Promise<void>;
 
 type MetricTopic =
     'co2'
@@ -24,18 +23,20 @@ type MetricTopic =
 
 export interface IMetricClient {
     connect(): Promise<void>;
-    subscribe(metricTopic: MetricTopic, callback: MetricCallback): Promise<Unsubscribe>;
+    handle(metricTopic: MetricTopic, callback: CallbackHandleMetric): void;
 }
 
 export class MqttMetricClient implements IMetricClient {
-    private readonly callbacks: { [topic: string]: MetricCallback[] } = { };
+    private readonly callbacks: { [topic: string]: CallbackHandleMetric[] } = { };
     private mqttClient: mqtt.AsyncMqttClient;
 
     constructor(private brokerUrl: string) {
     }
 
-    public connect(): Promise<void> {
+    public async connect(): Promise<void> {
         this.mqttClient = mqtt.connect(this.brokerUrl);
+
+        await this.mqttClient.subscribe('#');
 
         this.mqttClient.on('message', async (topic: string, message: string) => {
             const callbacks = this.callbacks[topic];
@@ -49,29 +50,15 @@ export class MqttMetricClient implements IMetricClient {
             for (const callback of callbacks)
                 await callback(metric);
         });
-        
-        return new Promise<void>(resolve => {
-            this.mqttClient.on('connect', resolve);
-        });
     }
 
-    public async subscribe(metricTopic: MetricTopic, callback: MetricCallback): Promise<Unsubscribe> {
+    public handle(metricTopic: MetricTopic, callback: CallbackHandleMetric): void {
         const topic = `metrics/${metricTopic}`;
-
         const callbacks = this.callbacks[topic] || [];
-        if (callbacks.length === 0)
-            await this.mqttClient.subscribe(topic);
 
-        const index = callbacks.push(callback) - 1;
+        callbacks.push(callback) - 1;
 
         this.callbacks[topic] = callbacks;
-
-        return async () => {
-            callbacks.splice(index, 1);
-
-            if (callbacks.length === 0)
-                await this.mqttClient.unsubscribe(topic);
-        };
     }
 }
 

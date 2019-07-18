@@ -7,8 +7,8 @@ namespace Application.Core
     {
         Task ConnectAsync();
 
-        Task SubscribeAsync(string metricId, Action<Metric> handler);
+        void Handle(string metricId, Action<Metric> handler);
 
-        Task SubscribeAsync(string metricId, Func<Metric, Task> handler);
+        void Handle(string metricId, Func<Metric, Task> handler);
     }
 }

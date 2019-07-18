@@ -9,10 +9,13 @@ const cold = 15;
 
     console.log('Successfully connected to metric stream');
 
-    await metrics.subscribe('co2', async (temperature) => {
+    await metrics.handle('temperature', async (temperature) => {
         console.log(`Temperature: ${temperature.value}`);
 
         await controls.setDeviceState('redLamp', (temperature.value >= hot));
         await controls.setDeviceState('blueLamp', (temperature.value <= cold));
     });
+    
+    await metrics.handle('co2', async (co2) =>
+        console.log(`CO2: ${co2.value}`));
 })();
