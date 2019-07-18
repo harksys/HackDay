@@ -1,20 +1,27 @@
-﻿using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Client.Options;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿// <copyright file="MqttMetricClient.cs" company="HARK">
+// Copyright (c) HARK. All rights reserved.
+// </copyright>
 
 namespace Application.Core
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using MQTTnet;
+    using MQTTnet.Client;
+    using MQTTnet.Client.Options;
+
+    using Newtonsoft.Json;
+
+    /// <inheritdoc />
     public sealed class MqttMetricClient : IMetricClient
     {
-        private readonly IDictionary<string, List<Func<Metric, Task>>> _handlers = new Dictionary<string, List<Func<Metric, Task>>>();
-
-        private readonly IMqttClient _mqttClient;
-        private readonly IMqttClientOptions _mqttClientOptions;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MqttMetricClient"/> class.
+        /// </summary>
+        /// <param name="address">The mqtt address.</param>
+        /// <param name="port">The mqtt port.</param>
         public MqttMetricClient(string address, int port)
         {
             if (string.IsNullOrWhiteSpace(address))
@@ -29,17 +36,26 @@ namespace Application.Core
 
             var factory = new MqttFactory();
 
-            _mqttClient = factory.CreateMqttClient();
-            _mqttClientOptions = new MqttClientOptionsBuilder()
+            this.MqttClient = factory.CreateMqttClient();
+
+            this.MqttClientOptions = new MqttClientOptionsBuilder()
                 .WithTcpServer(address, port)
                 .Build();
         }
 
+        private IDictionary<string, List<Func<Metric, Task>>> Handlers { get; }
+            = new Dictionary<string, List<Func<Metric, Task>>>();
+
+        private IMqttClient MqttClient { get; }
+
+        private IMqttClientOptions MqttClientOptions { get; }
+
+        /// <inheritdoc />
         public async Task ConnectAsync()
         {
-            _mqttClient.UseApplicationMessageReceivedHandler(async e =>
+            this.MqttClient.UseApplicationMessageReceivedHandler(async e =>
             {
-                if (!_handlers.TryGetValue(e.ApplicationMessage.Topic, out var handlers))
+                if (!this.Handlers.TryGetValue(e.ApplicationMessage.Topic, out var handlers))
                 {
                     return;
                 }
@@ -58,15 +74,16 @@ namespace Application.Core
                 }
             });
 
-            await _mqttClient.ConnectAsync(_mqttClientOptions);
+            await this.MqttClient.ConnectAsync(this.MqttClientOptions);
 
             var filter = new TopicFilterBuilder()
                 .WithTopic("#")
                 .Build();
 
-            await _mqttClient.SubscribeAsync(filter);
+            await this.MqttClient.SubscribeAsync(filter);
         }
 
+        /// <inheritdoc />
         public void Handle(string metricId, Action<Metric> handler)
         {
             if (string.IsNullOrWhiteSpace(metricId))
@@ -79,10 +96,11 @@ namespace Application.Core
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            Handle(metricId, async metric =>
+            this.Handle(metricId, async metric =>
                 await Task.Run(() => handler(metric)));
         }
 
+        /// <inheritdoc />
         public void Handle(string metricId, Func<Metric, Task> handler)
         {
             if (string.IsNullOrWhiteSpace(metricId))
@@ -97,11 +115,11 @@ namespace Application.Core
 
             var topic = $"metrics/{metricId}";
 
-            if (!_handlers.TryGetValue(topic, out var handlers))
+            if (!this.Handlers.TryGetValue(topic, out var handlers))
             {
                 handlers = new List<Func<Metric, Task>>();
 
-                _handlers.Add(topic, handlers);
+                this.Handlers.Add(topic, handlers);
             }
 
             handlers.Add(handler);
