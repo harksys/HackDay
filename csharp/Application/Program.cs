@@ -24,9 +24,14 @@ namespace Application
 
             metrics.Handle("temperature", async metric =>
             {
+                Console.WriteLine($"Temperature: {metric.Value}");
+
                 await controls.SetDeviceStateAsync("redLamp", metric.Value >= HotTemperature);
                 await controls.SetDeviceStateAsync("blueLamp", metric.Value <= ColdTemperature);
             });
+
+            metrics.Handle("co2", metric =>            
+                Console.WriteLine($"CO2: {metric.Value}"));
 
             while (true) ;
         }

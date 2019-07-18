@@ -79,7 +79,7 @@ namespace Application.Core
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            Subscribe(metricId, async metric =>
+            Handle(metricId, async metric =>
                 await Task.Run(() => handler(metric)));
         }
 
