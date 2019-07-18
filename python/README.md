@@ -13,3 +13,8 @@ Activate the conda environment
 ```
 conda activate harkhack
 ```
+
+Starting the demo application
+```
+python run.py
+```
