@@ -1,10 +1,14 @@
 {
-    "strict": true,
-	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
-		"lib": ["es6", "esnext", "dom"],
-		"baseUrl": "./",
-		"moduleResolution": "node"
-	}
+  "strict": true,
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": [
+      "es6",
+      "esnext",
+      "dom"
+    ],
+    "baseUrl": "./",
+    "moduleResolution": "node"
+  }
 }
