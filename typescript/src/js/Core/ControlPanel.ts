@@ -4,7 +4,7 @@ import { DeviceType, MetricType } from './Enums';
 import { default as config } from './Config';
 
 type DeviceStates = {
-  [key in MetricType]: boolean;
+  [key in DeviceType]: boolean;
 };
 
 type MotorStatus = {
