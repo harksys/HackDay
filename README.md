@@ -175,7 +175,7 @@ Metrics are streamed to an MQTT feed every second. This includes values from all
 
 Sensor metrics are identified by the following ids:
 
-| Id | Type | Source | Available in Emulator |
+| Id (string) | Type | Source | Available in Emulator |
 |-|-|-|-|
 |  1 | temperature | IFM   | YES |
 |  2 | vibration   | IFM   | YES |
@@ -199,10 +199,10 @@ The payload includes the id, the value and the UTC received time.
 ##### Example:
 
 ```json
-{"id":"1","receivedUtc":"2019-07-15T11:49:18Z","value":20}
-{"id":"2","receivedUtc":"2019-07-15T11:49:18Z","value":0}
-{"id":"8","receivedUtc":"2019-07-15T11:49:18Z","value":60
-{"id":"10","receivedUtc":"2019-07-15T11:49:18Z","value":10}
+{ "id":"1", "receivedUtc":"2019-07-15T11:49:18Z", "value":20}
+{ "id":"2", "receivedUtc":"2019-07-15T11:49:18Z", "value":0}
+{ "id":"8", "receivedUtc":"2019-07-15T11:49:18Z", "value":60
+{ "id":"10" ,"receivedUtc":"2019-07-15T11:49:18Z", "value":10}
 ```
 
 ### IO Devices & Motor Speed Metrics
