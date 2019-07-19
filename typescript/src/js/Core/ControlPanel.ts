@@ -43,15 +43,15 @@ export class ControlPanelHttpClient implements IControlPanel {
   }
 
   public async getDeviceStates(): Promise<DeviceStates> {
-    const response = await request.get(`${this.baseUrl}/devices/state`, { json: true });
+    const { state } = await request.get(`${this.baseUrl}/devices/state`, { json: true });
 
-    return response.state as DeviceStates;
+    return state as DeviceStates;
   }
 
   public async getDeviceState(type: DeviceType): Promise<boolean> {
-    const response = await request.get(`${this.baseUrl}/devices/${type}/state`, { json: true });
+    const { isOn } = await request.get(`${this.baseUrl}/devices/${type}/state`, { json: true });
 
-    return response.isOn;
+    return isOn;
   }
 
   public async setMotorSpeed(speed: number): Promise<void> {

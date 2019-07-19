@@ -16,5 +16,5 @@ conda activate harkhack
 
 Starting the demo application
 ```
-python run.py
+python app.py
 ```

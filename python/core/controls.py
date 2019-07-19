@@ -1,13 +1,14 @@
 import requests
 
+from core.enums import DeviceType, MetricType
 from collections import namedtuple
 
 class ControlPanelHttpClient:
     def __init__(self, base_url):
         self.base_url = base_url
     
-    def set_metric(self, id, value):
-        requests.post(f"{self.base_url}/metric", json={ "id": id, "value": value })
+    def set_metric(self, metric_type, value):
+        requests.post(f"{self.base_url}/metric", json={ "id": metric_type, "value": value })
 
     def get_metrics(self):
         r = requests.get(f"{self.base_url}/metric")
@@ -15,11 +16,11 @@ class ControlPanelHttpClient:
         
         return namedtuple("Metrics", d.keys())(*d.values())
 
-    def set_device_state(self, key, active):
-        requests.post(f"{self.base_url}/devices/{key}/state", json={ "turnOn": active })
+    def set_device_state(self, device_type, active):
+        requests.post(f"{self.base_url}/devices/{device_type}/state", json={ "turnOn": active })
 
-    def get_device_state(self, key):
-        r = requests.get(f"{self.base_url}/devices/{key}/state")
+    def get_device_state(self, device_type):
+        r = requests.get(f"{self.base_url}/devices/{device_type}/state")
         d = r.json()
         
         return namedtuple("DeviceState", d.keys())(*d.values())
