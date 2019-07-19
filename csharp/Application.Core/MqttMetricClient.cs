@@ -8,6 +8,10 @@ namespace Application.Core
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    using Application.Common;
+    using Application.Common.Enums;
+    using Application.Common.Models;
+
     using MQTTnet;
     using MQTTnet.Client;
     using MQTTnet.Client.Options;
@@ -84,36 +88,52 @@ namespace Application.Core
         }
 
         /// <inheritdoc />
-        public void Handle(string metricId, Action<Metric> handler)
+        public void Handle(Action<Metric> handler)
         {
-            if (string.IsNullOrWhiteSpace(metricId))
-            {
-                throw new ArgumentException(nameof(metricId));
-            }
-
             if (handler == null)
             {
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            this.Handle(metricId, async metric =>
+            this.Handle(async metric =>
                 await Task.Run(() => handler(metric)));
         }
 
         /// <inheritdoc />
-        public void Handle(string metricId, Func<Metric, Task> handler)
+        public void Handle(Func<Metric, Task> handler)
         {
-            if (string.IsNullOrWhiteSpace(metricId))
-            {
-                throw new ArgumentException(nameof(metricId));
-            }
-
             if (handler == null)
             {
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            var topic = $"metrics/{metricId}";
+            foreach (MetricType metricType in Enum.GetValues(typeof(MetricType)))
+            {
+                this.Handle(metricType, handler);
+            }
+        }
+
+        /// <inheritdoc />
+        public void Handle(MetricType metricType, Action<Metric> handler)
+        {
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+
+            this.Handle(metricType, async metric =>
+                await Task.Run(() => handler(metric)));
+        }
+
+        /// <inheritdoc />
+        public void Handle(MetricType metricType, Func<Metric, Task> handler)
+        {
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+
+            var topic = $"metrics/{(int)metricType}";
 
             if (!this.Handlers.TryGetValue(topic, out var handlers))
             {

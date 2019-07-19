@@ -1,18 +1,10 @@
 import * as request from 'request-promise';
 
+import { DeviceType, MetricType } from './Enums';
 import { default as config } from './Config';
-import { MetricId } from './MetricClient';
-
-type DeviceKey =
-  'heater'
-  | 'fan'
-  | 'kettle'
-  | 'greenLamp'
-  | 'blueLamp'
-  | 'redLamp';
 
 type DeviceStates = {
-  [key in DeviceKey]: boolean;
+  [key in DeviceType]: boolean;
 };
 
 type MotorStatus = {
@@ -26,13 +18,13 @@ type MotorStatus = {
 };
 
 export interface IControlPanel {
-  setMetric(id: MetricId, value: number): Promise<void>;
+  setMetric(metricType: MetricType, value: number): Promise<void>;
 
-  setDeviceState(key: DeviceKey, active: boolean): Promise<void>;
+  setDeviceState(deviceType: DeviceType, active: boolean): Promise<void>;
 
   getDeviceStates(): Promise<DeviceStates>;
 
-  getDeviceState(key: DeviceKey): Promise<boolean>;
+  getDeviceState(deviceType: DeviceType): Promise<boolean>;
 
   setMotorSpeed(speed: number): Promise<void>;
 
@@ -42,24 +34,24 @@ export interface IControlPanel {
 export class ControlPanelHttpClient implements IControlPanel {
   constructor(private baseUrl: string) { }
 
-  public async setMetric(id: MetricId, value: number): Promise<void> {
-    await request.post(`${this.baseUrl}/metric`, { json: { id, value } });
+  public async setMetric(metricType: MetricType, value: number): Promise<void> {
+    await request.post(`${this.baseUrl}/metric`, { json: { id: `${metricType}`, value } });
   }
 
-  public async setDeviceState(key: DeviceKey, active: boolean): Promise<void> {
-    await request.post(`${this.baseUrl}/devices/${key}/state`, { json: { turnOn: active } });
+  public async setDeviceState(deviceType: DeviceType, active: boolean): Promise<void> {
+    await request.post(`${this.baseUrl}/devices/${deviceType}/state`, { json: { turnOn: active } });
   }
 
   public async getDeviceStates(): Promise<DeviceStates> {
-    const response = await request.get(`${this.baseUrl}/devices/state`, { json: true });
+    const { state } = await request.get(`${this.baseUrl}/devices/state`, { json: true });
 
-    return response.state as DeviceStates;
+    return state as DeviceStates;
   }
 
-  public async getDeviceState(key: DeviceKey): Promise<boolean> {
-    const response = await request.get(`${this.baseUrl}/devices/${key}/state`, { json: true });
+  public async getDeviceState(deviceType: DeviceType): Promise<boolean> {
+    const { isOn } = await request.get(`${this.baseUrl}/devices/${deviceType}/state`, { json: true });
 
-    return response.isOn;
+    return isOn;
   }
 
   public async setMotorSpeed(speed: number): Promise<void> {

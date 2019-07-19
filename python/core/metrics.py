@@ -1,10 +1,11 @@
 import json
 import paho.mqtt.client as mqtt
 
+from core.enums import MetricType
 from collections import namedtuple
 
 class MqttMetricClient:
-    def __init__(self, address, port):   
+    def __init__(self, address, port):
         self.address = address
         self.port = port
 
@@ -18,8 +19,12 @@ class MqttMetricClient:
         self.client.subscribe('#')
         self.client.loop_start()
 
-    def handle(self, id, callback):
-        topic = f"metrics/{id}"
+    def handle_all(self, callback):
+        for metric_type in MetricType:
+            self.handle(metric_type, callback)
+
+    def handle(self, metric_type, callback):
+        topic = f"metrics/{metric_type}"
 
         callbacks = self.callbacks.get(topic)
         if not callbacks:

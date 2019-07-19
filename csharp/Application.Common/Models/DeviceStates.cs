@@ -2,7 +2,7 @@
 // Copyright (c) HARK. All rights reserved.
 // </copyright>
 
-namespace Application.Core
+namespace Application.Common.Models
 {
     /// <summary>
     /// Represents the state of all IO devices.

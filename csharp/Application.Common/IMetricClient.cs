@@ -2,10 +2,13 @@
 // Copyright (c) HARK. All rights reserved.
 // </copyright>
 
-namespace Application.Core
+namespace Application.Common
 {
     using System;
     using System.Threading.Tasks;
+
+    using Application.Common.Enums;
+    using Application.Common.Models;
 
     /// <summary>
     /// The metric client.
@@ -19,17 +22,29 @@ namespace Application.Core
         Task ConnectAsync();
 
         /// <summary>
-        /// Sets a message handler for the given metric type.
+        /// Sets a message handler for all metric types.
         /// </summary>
-        /// <param name="metricId">The metric type id.</param>
         /// <param name="handler">The handler function.</param>
-        void Handle(string metricId, Action<Metric> handler);
+        void Handle(Action<Metric> handler);
+
+        /// <summary>
+        /// Sets a message handler for all metric types.
+        /// </summary>
+        /// <param name="handler">The handler function.</param>
+        void Handle(Func<Metric, Task> handler);
 
         /// <summary>
         /// Sets a message handler for the given metric type.
         /// </summary>
-        /// <param name="metricId">The metric type id.</param>
+        /// <param name="metricType">The metric type.</param>
         /// <param name="handler">The handler function.</param>
-        void Handle(string metricId, Func<Metric, Task> handler);
+        void Handle(MetricType metricType, Action<Metric> handler);
+
+        /// <summary>
+        /// Sets a message handler for the given metric type.
+        /// </summary>
+        /// <param name="metricType">The metric type.</param>
+        /// <param name="handler">The handler function.</param>
+        void Handle(MetricType metricType, Func<Metric, Task> handler);
     }
 }

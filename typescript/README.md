@@ -10,5 +10,5 @@ npm install
 
 Starting the demo application
 ```
-npm run start
+npm run app
 ```

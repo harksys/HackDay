@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./src/js/App.ts"
+    "app": "ts-node ./src/js/App.ts"
   },
   "author": "Hark",
   "license": "ISC",

@@ -1,22 +1,7 @@
 import * as mqtt from 'async-mqtt';
 
+import { MetricType } from './Enums';
 import { default as config } from './Config';
-
-export type MetricId =
-  1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14;
 
 type Metric = {
   id: string;
@@ -29,7 +14,7 @@ type CallbackHandleMetric = (metric: Metric) => Promise<void>;
 export interface IMetricClient {
   connect(): Promise<void>;
 
-  handle(metricTopic: MetricId, calId: CallbackHandleMetric): void;
+  handle(metricType: MetricType, callback: CallbackHandleMetric): void;
 }
 
 export class MqttMetricClient implements IMetricClient {
@@ -61,11 +46,17 @@ export class MqttMetricClient implements IMetricClient {
     });
   }
 
-  public handle(metricTopic: MetricId, callback: CallbackHandleMetric): void {
-    const topic = `metrics/${metricTopic}`;
+  public handleAll(callback: CallbackHandleMetric): void {
+    for (const metricType in MetricType) {
+      this.handle(Number(metricType), callback);
+    }
+  }
+
+  public handle(metricType: MetricType, callback: CallbackHandleMetric): void {
+    const topic = `metrics/${metricType}`;
     const callbacks = this.callbacks[topic] || [];
 
-    callbacks.push(callback) - 1;
+    callbacks.push(callback);
 
     this.callbacks[topic] = callbacks;
   }
