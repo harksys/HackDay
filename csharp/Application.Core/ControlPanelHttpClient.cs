@@ -7,6 +7,11 @@ namespace Application.Core
     using System;
     using System.Threading.Tasks;
 
+    using Application.Common;
+    using Application.Common.Enums;
+    using Application.Common.Models;
+    using Application.Core.Extensions;
+
     using RestSharp;
 
     /// <inheritdoc />
@@ -29,42 +34,27 @@ namespace Application.Core
         private RestClient RestClient { get; }
 
         /// <inheritdoc />
-        public async Task SetMetricAsync(string id, decimal value)
+        public async Task SetMetricAsync(MetricType metricType, decimal value)
         {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                throw new ArgumentException(nameof(id));
-            }
-
             var request = new RestRequest("metric", Method.POST)
-                .AddJsonBody(new { id, value });
+                .AddJsonBody(new { id = $"{(int)metricType}", value });
 
             await this.RestClient.ExecuteTaskAsync(request);
         }
 
         /// <inheritdoc />
-        public async Task SetDeviceStateAsync(string key, bool active)
+        public async Task SetDeviceStateAsync(DeviceType deviceType, bool active)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentException(nameof(key));
-            }
-
-            var request = new RestRequest($"devices/{key}/state", Method.POST)
+            var request = new RestRequest($"devices/{deviceType.ToCamelCaseString()}/state", Method.POST)
                 .AddJsonBody(new { turnOn = active });
 
             await this.RestClient.ExecuteTaskAsync(request);
         }
 
         /// <inheritdoc />
-        public async Task<bool> GetDeviceStateAsync(string key)
+        public async Task<bool> GetDeviceStateAsync(DeviceType deviceType)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentException(nameof(key));
-            }
-
-            var request = new RestRequest($"devices/{key}/state", Method.GET);
+            var request = new RestRequest($"devices/{deviceType.ToCamelCaseString()}/state", Method.GET);
             var response = await this.RestClient.ExecuteTaskAsync<DeviceState>(request);
 
             return response.Data.IsOn;
@@ -100,6 +90,18 @@ namespace Application.Core
             var response = await this.RestClient.ExecuteTaskAsync<MotorStatus>(request);
 
             return response.Data;
+        }
+
+        /// <summary>
+        /// Represents a api state response.
+        /// </summary>
+        /// <typeparam name="T">The state response type.</typeparam>
+        private sealed class StateResponse<T>
+        {
+            /// <summary>
+            /// Gets or sets the state response.
+            /// </summary>
+            public T State { get; set; }
         }
     }
 }

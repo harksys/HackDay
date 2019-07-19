@@ -1,4 +1,8 @@
-﻿namespace Application.Core
+﻿// <copyright file="DeviceState.cs" company="HARK">
+// Copyright (c) HARK. All rights reserved.
+// </copyright>
+
+namespace Application.Common.Models
 {
     /// <summary>
     /// Represents the state of an IO device.

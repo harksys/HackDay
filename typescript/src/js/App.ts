@@ -2,7 +2,7 @@ import { controls, metrics } from './Core';
 import { DeviceType, MetricType } from './Core';
 
 const hotTemperature: number = 20;
-const coldTemperature: number = 15;
+const coldTemperature: number = 8;
 
 // turn on the red/blue lamp according to the temperature
 (async (): Promise<void> => {
@@ -14,7 +14,7 @@ const coldTemperature: number = 15;
   await metrics.handleAll(async (metric): Promise<void> =>
     console.log(metric));
 
-  await metrics.handle(MetricType.EpcTemperature, async (temperature): Promise<void> => {
+  await metrics.handle(MetricType.IfmTemperature, async (temperature): Promise<void> => {
     console.log(`Temperature: ${temperature.value}`);
 
     await controls.setDeviceState(DeviceType.RedLamp, (temperature.value >= hotTemperature));

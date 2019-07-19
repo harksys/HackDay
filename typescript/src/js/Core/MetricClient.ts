@@ -14,7 +14,7 @@ type CallbackHandleMetric = (metric: Metric) => Promise<void>;
 export interface IMetricClient {
   connect(): Promise<void>;
 
-  handle(type: MetricType, callback: CallbackHandleMetric): void;
+  handle(metricType: MetricType, callback: CallbackHandleMetric): void;
 }
 
 export class MqttMetricClient implements IMetricClient {
@@ -47,13 +47,13 @@ export class MqttMetricClient implements IMetricClient {
   }
 
   public handleAll(callback: CallbackHandleMetric): void {
-    for (const type in MetricType) {
-      this.handle(Number(type), callback);
+    for (const metricType in MetricType) {
+      this.handle(Number(metricType), callback);
     }
   }
 
-  public handle(type: MetricType, callback: CallbackHandleMetric): void {
-    const topic = `metrics/${type}`;
+  public handle(metricType: MetricType, callback: CallbackHandleMetric): void {
+    const topic = `metrics/${metricType}`;
     const callbacks = this.callbacks[topic] || [];
 
     callbacks.push(callback);

@@ -18,13 +18,13 @@ type MotorStatus = {
 };
 
 export interface IControlPanel {
-  setMetric(type: MetricType, value: number): Promise<void>;
+  setMetric(metricType: MetricType, value: number): Promise<void>;
 
-  setDeviceState(type: DeviceType, active: boolean): Promise<void>;
+  setDeviceState(deviceType: DeviceType, active: boolean): Promise<void>;
 
   getDeviceStates(): Promise<DeviceStates>;
 
-  getDeviceState(type: DeviceType): Promise<boolean>;
+  getDeviceState(deviceType: DeviceType): Promise<boolean>;
 
   setMotorSpeed(speed: number): Promise<void>;
 
@@ -34,12 +34,12 @@ export interface IControlPanel {
 export class ControlPanelHttpClient implements IControlPanel {
   constructor(private baseUrl: string) { }
 
-  public async setMetric(type: MetricType, value: number): Promise<void> {
-    await request.post(`${this.baseUrl}/metric`, { json: { id: type, value } });
+  public async setMetric(metricType: MetricType, value: number): Promise<void> {
+    await request.post(`${this.baseUrl}/metric`, { json: { id: metricType, value } });
   }
 
-  public async setDeviceState(type: DeviceType, active: boolean): Promise<void> {
-    await request.post(`${this.baseUrl}/devices/${type}/state`, { json: { turnOn: active } });
+  public async setDeviceState(deviceType: DeviceType, active: boolean): Promise<void> {
+    await request.post(`${this.baseUrl}/devices/${deviceType}/state`, { json: { turnOn: active } });
   }
 
   public async getDeviceStates(): Promise<DeviceStates> {
@@ -48,8 +48,8 @@ export class ControlPanelHttpClient implements IControlPanel {
     return state as DeviceStates;
   }
 
-  public async getDeviceState(type: DeviceType): Promise<boolean> {
-    const { isOn } = await request.get(`${this.baseUrl}/devices/${type}/state`, { json: true });
+  public async getDeviceState(deviceType: DeviceType): Promise<boolean> {
+    const { isOn } = await request.get(`${this.baseUrl}/devices/${deviceType}/state`, { json: true });
 
     return isOn;
   }

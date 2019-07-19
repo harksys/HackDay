@@ -2,7 +2,7 @@ from core import metrics, controls
 from core.enums import DeviceType, MetricType
 
 hot_temperature = 20
-cold_temperature = 15
+cold_temperature = 8
 
 def handle_all(metric):
     print(metric)

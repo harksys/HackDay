@@ -6,7 +6,7 @@ namespace Application
 {
     using System;
     using System.Threading.Tasks;
-
+    using Application.Common.Enums;
     using Application.Core;
 
     /// <summary>
@@ -22,7 +22,7 @@ namespace Application
         private const int MqttBrokerPort = 1883;
 
         private const int HotTemperature = 20;
-        private const int ColdTemperature = 15;
+        private const int ColdTemperature = 8;
 
         private static string ControlPanelUrl => $"http://{GatewayIp}:3000/api";
 
@@ -42,39 +42,24 @@ namespace Application
 
             Console.WriteLine("Successfully connected to metric stream");
 
-            metrics.Handle($"{MetricIds.Epc_Temperature}", async metric =>
+            metrics.Handle(metric =>
+                Console.WriteLine(metric.ToString()));
+
+            metrics.Handle(MetricType.IfmTemperature, async metric =>
             {
                 Console.WriteLine($"Temperature: {metric.Value}");
 
-                await controls.SetDeviceStateAsync("redLamp", metric.Value >= HotTemperature);
-                await controls.SetDeviceStateAsync("blueLamp", metric.Value <= ColdTemperature);
+                await controls.SetDeviceStateAsync(DeviceType.RedLamp, metric.Value >= HotTemperature);
+                await controls.SetDeviceStateAsync(DeviceType.BlueLamp, metric.Value <= ColdTemperature);
             });
 
-            metrics.Handle($"{MetricIds.Epc_Co2}", metric =>
+            metrics.Handle(MetricType.EpcCo2, metric =>
                 Console.WriteLine($"CO2: {metric.Value}"));
 
             while (true)
             {
                 // wait for exit
             }
-        }
-
-        internal enum MetricIds
-        {
-            Ifm_Temperature = 1,
-            Ifm_Vibration = 2,
-            Motor_Rpm = 3,
-            Motor_Frequency = 4,
-            Mototr_Amps = 5,
-            Motor_Watts = 6,
-            Mototr_Volts = 7,
-            Epc_Co2 = 8,
-            Epc_Temperature = 9,
-            Epc_Humidity = 10,
-            Meter_Amps = 11,
-            Meter_Volts = 12,
-            Meter_Kw = 13,
-            Meter_Kwh = 14,
         }
     }
 }
