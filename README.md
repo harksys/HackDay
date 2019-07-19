@@ -189,7 +189,7 @@ Sensor metrics are identified by the following ids:
 | 10 | humidity    | EPC   | YES |
 | 11 | amps        | METER | NO  |
 | 12 | volts       | METER | NO  |
-| 13 | kw          | METER | NO  |
+| 13 | kw          | METER | YES |
 | 14 | kwh         | METER | YES |
 
 The topic will be `metrics/{id}` - ie: `metrics/1` for the IFM temperature data.
