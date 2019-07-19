@@ -35,7 +35,7 @@ export class ControlPanelHttpClient implements IControlPanel {
   constructor(private baseUrl: string) { }
 
   public async setMetric(metricType: MetricType, value: number): Promise<void> {
-    await request.post(`${this.baseUrl}/metric`, { json: { id: metricType, value } });
+    await request.post(`${this.baseUrl}/metric`, { json: { id: `${metricType}`, value } });
   }
 
   public async setDeviceState(deviceType: DeviceType, active: boolean): Promise<void> {
